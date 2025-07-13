@@ -1,15 +1,15 @@
-
 # --- Deployment Configuration ---
 name: kafka-console-consumer
-image: confluentinc/cp-kafka:7.3.0 # A public image with Kafka tools
-namespace: default
+image: confluentinc/cp-kafka:7.3.0
+namespace: kafka
 replicas: 1
 
-# We override the default command of the image to run the consumer tool.
+# This command is essential for the test to work.
+# It runs the consumer tool inside the container.
 command:
   - "/bin/sh"
   - "-c"
-  - "kafka-console-consumer --bootstrap-server kafka-service.kafka-ns.svc.cluster.local:9092 --topic my-test-topic --group test-consumer-group --from-beginning"
+  - "echo 'Starting consumer...'; kafka-console-consumer --bootstrap-server kafka-svc.kafka.svc.cluster.local:9092 --topic my-test-topic --group test-consumer-group | while read line; do echo hi; sleep 0.01; done"
 
 # --- KEDA Scaling Configuration ---
 scaling:
@@ -17,7 +17,8 @@ scaling:
   min_replicas: 0 # Scale down to zero when idle
   max_replicas: 10
   trigger_metadata:
-    bootstrapServers: "kafka-service.kafka-ns.svc.cluster.local:9092"
+    # This address points to the service created by the Helm chart
+    bootstrapServers: "kafka-svc.kafka.svc.cluster.local:9092"
     topic: "my-test-topic"
     consumerGroup: "test-consumer-group"
-    lagThreshold: "10"
+    lagThreshold: "10" # Scale up when lag is >= 10

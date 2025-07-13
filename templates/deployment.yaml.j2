@@ -19,12 +19,15 @@ spec:
       containers:
       - name: {{ name }}
         image: "{{ image }}"
+        {# This block will only be rendered if 'command' is defined in the values file #}
+        {% if command is defined and command %}
         command:
-          - "/bin/sh"
-          - "-c"
-          - "kafka-console-consumer --bootstrap-server kafka-service.kafka-ns.svc.cluster.local:9092 --topic my-test-topic --group test-consumer-group --from-beginning"
+          {% for line in command %}
+          - "{{ line }}"
+          {% endfor %}
+        {% endif %}
         ports:
-          - containerPort: {{ port }}
+        - containerPort: {{ port }}
         resources:
           requests:
             cpu: "{{ cpu_request }}"
