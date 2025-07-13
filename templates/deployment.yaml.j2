@@ -1,0 +1,34 @@
+# templates/deployment.yaml.j2
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ name }}
+  namespace: {{ namespace }}
+  labels:
+    app: {{ name }}
+spec:
+  replicas: {{ replicas }}
+  selector:
+    matchLabels:
+      app: {{ name }}
+  template:
+    metadata:
+      labels:
+        app: {{ name }}
+    spec:
+      containers:
+      - name: {{ name }}
+        image: "{{ image }}"
+        command:
+          - "/bin/sh"
+          - "-c"
+          - "kafka-console-consumer --bootstrap-server kafka-service.kafka-ns.svc.cluster.local:9092 --topic my-test-topic --group test-consumer-group --from-beginning"
+        ports:
+          - containerPort: {{ port }}
+        resources:
+          requests:
+            cpu: "{{ cpu_request }}"
+            memory: "{{ mem_request }}"
+          limits:
+            cpu: "{{ cpu_limit }}"
+            memory: "{{ mem_limit }}"

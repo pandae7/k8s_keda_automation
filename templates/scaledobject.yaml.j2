@@ -1,0 +1,20 @@
+# templates/scaledobject.yaml.j2
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: {{ name }}-so
+  namespace: {{ namespace }}
+spec:
+  scaleTargetRef:
+    name: {{ name }}
+  minReplicaCount: {{ scaling.min_replicas | default(1) }}
+  maxReplicaCount: {{ scaling.max_replicas | default(10) }}
+  pollingInterval: {{ scaling.polling_interval | default(30) }}
+  cooldownPeriod: {{ scaling.cooldown_period | default(300) }}
+  triggers:
+  - type: {{ scaling.trigger_type }}
+    metadata:
+      # Dynamically generate metadata key-value pairs
+      {% for key, value in scaling.trigger_metadata.items() %}
+      {{ key }}: "{{ value }}"
+      {% endfor %}

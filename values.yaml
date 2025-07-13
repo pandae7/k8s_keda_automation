@@ -1,0 +1,23 @@
+
+# --- Deployment Configuration ---
+name: kafka-console-consumer
+image: confluentinc/cp-kafka:7.3.0 # A public image with Kafka tools
+namespace: default
+replicas: 1
+
+# We override the default command of the image to run the consumer tool.
+command:
+  - "/bin/sh"
+  - "-c"
+  - "kafka-console-consumer --bootstrap-server kafka-service.kafka-ns.svc.cluster.local:9092 --topic my-test-topic --group test-consumer-group --from-beginning"
+
+# --- KEDA Scaling Configuration ---
+scaling:
+  trigger_type: kafka
+  min_replicas: 0 # Scale down to zero when idle
+  max_replicas: 10
+  trigger_metadata:
+    bootstrapServers: "kafka-service.kafka-ns.svc.cluster.local:9092"
+    topic: "my-test-topic"
+    consumerGroup: "test-consumer-group"
+    lagThreshold: "10"
