@@ -321,3 +321,7 @@ kubectl delete scaledobject kafka-console-consumer-so
 kubectl delete deployment kafka-app
 ```
 
+### References - 
+For Kafka Broker, Producer and Consumer - https://medium.com/@martin.hodges/deploying-kafka-on-a-kind-kubernetes-cluster-for-development-and-testing-purposes-ed7adefe03cb
+
+For Kafka and Keda scaling Object - https://keda.sh/docs/2.5/scalers/apache-kafka/
